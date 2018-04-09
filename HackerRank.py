@@ -1,9 +1,160 @@
 
+# Binomial Probability
+# The ratio of boys to girls for babies born in Russia is . If there is  child born per 
+# birth, what proportion of Russian families with exactly  children will 
+# have at least  boys?
+# Write a program to compute the answer using the above parameters. 
+# Then print your result, rounded to a scale of  decimal places (i.e.,  format).
+
+
+def binomProb(n, k, boy, girl):
+    prob = 0
+    for i in range(k,n+1):
+        combo = combinations(n,i)
+        p_success = boy**i
+        p_fail = (1-boy)**(n-i)
+        prob += (combo*p_success*p_fail)
+    return round(prob, 3)
+
+def combinations(N,K):
+    numerator = factorialMemoized(N)
+    denom = factorialMemoized(K)*factorialMemoized(N-K)
+    return numerator/denom
+
+def factorialRecur(x):
+    if x == 0:
+        return 1
+    else:
+        return x*factorialRecur(x-1)
+
+def factorialMemoized(x):
+    fact_dict = {}
+    fact_dict[0] = 1
+    fact_dict[1] = 1
+    prod = 1
+    for i in range(x+1):
+        if i in fact_dict.keys():
+            prod *= fact_dict[i]
+        else:
+            fact_dict[i] = i*prod
+            prod *= i
+    return prod
+
+def factorialLoop(x):
+    num = 1
+    if x == 0:
+        return num
+    else:
+        for i in range(1,x+1):
+            num *= i
+    return num
+   
+    
+if __name__ == "__main__":
+    r = list(map(float, input().strip().split()))
+    boy = r[0]/sum(r)
+    girl = r[1]/sum(r)
+    n,k = 6, 3
+    result = binomProb(n, k, boy,girl)
+    print(result)
+
+
+
+
+#IQR
+# The interquartile range of an array is the difference between its first () and 
+# third () quartiles (i.e., ).
+
+# Given an array, , of  integers and an array, , representing the respective 
+# frequencies of 's elements, construct a data set, , where each  occurs at frequency . 
+# Then calculate and print 's interquartile range, rounded to a scale of  decimal 
+# place (i.e.,  format).
+
+# Tip: Be careful to not use integer division when averaging the middle two elements 
+# for a data set with an even number of elements, and be sure to not include the 
+# median in your upper and lower data sets.
+
+
+def findIQR(N, X, F):
+    data = makeDataset(X,F)
+    q1, q2, q3 = findQuartiles(sum(F), data)
+    iqr = round(float(q3-q1),1)
+    return iqr
+
+def makeDataset(X,F):
+    data = []
+    for i, val in enumerate(X):
+        data.extend([val] * int(F[i]))
+    return data
+
+def findQuartiles(N, X):
+    X = sorted(X)
+    q2 = findMedian(N,X)
+    if N%2==0:
+        A = X[:N//2]
+        B = X[N//2:]
+        q1 = findMedian(len(A),A)
+        q3 = findMedian(len(B),B)
+    else:
+        A = X[:N//2]
+        B = X[(N//2)+1:]
+        q1 = findMedian(len(A),A)
+        q3 = findMedian(len(B),B)
+    return q1, q2, q3
+
+
+def findMedian(n,X):
+    if n%2==0:
+        median = (X[n//2] + X[(n//2)-1])/2.0
+        return median
+    else:
+        median = X[n//2]
+        return median
+
+
+if __name__ == "__main__":
+    N = int(input().strip())
+    X = list(map(int, input().strip().split()))
+    F = list(map(int, input().strip().split()))
+    result = findIQR(N, X, F)
+    print (result)
+
+
+
 # Quartiles
 # Given an array, , of  integers, calculate the respective first quartile (), 
 # second quartile (), and third quartile (). It is guaranteed that , , and  are integers.
 
+def findQuartiles(N, X):
+    X = sorted(X)
+    q2 = findMedian(N,X)
+    if N%2==0:
+        A = X[:N//2]
+        B = X[(N//2):]
+        q1 = findMedian(len(A),A)
+        q3 = findMedian(len(B),B)
+    else:
+        A = X[:N//2]
+        B = X[(N//2)+1:]
+        q1 = findMedian(len(A),A)
+        q3 = findMedian(len(B),B)
+    return q1, q2, q3
+    
 
+def findMedian(n,X):
+    if n%2==0:
+        median = (X[n//2] + X[(n//2)-1])/2
+        return int(median)
+    else:
+        median = X[n//2]
+        return int(median)
+
+
+if __name__ == "__main__":
+    N = int(input().strip())
+    X = list(map(int, input().strip().split()))
+    q1, q2, q3 = findQuartiles(N, X)
+    print ("{}\n{}\n{}".format(q1, q2, q3))
 
 
 
@@ -101,6 +252,61 @@ if __name__ == "__main__":
     X = list(map(int, input().strip().split(' ')))
     mean, median, mode = mean_median_mode(n, X)
     print('{}\n{}\n{}'.format(mean,median,mode))
+
+
+
+# BST
+
+class Node(object):
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+def checkBST(root):
+    tree = []
+    result = inOrderTraversal(root, tree)
+    checked = checkDuplicates(result)
+    if checked:
+        return False
+    else:
+        return result == sorted(result)
+
+
+def inOrderTraversal(root, tree):
+    if not root:
+        return tree
+    inOrderTraversal(root.left, tree)
+    tree.append(root.data)
+    inOrderTraversal(root.right, tree)
+    return tree
+
+def checkDuplicates(result):
+    elems = {}
+    for i in result:
+        if i not in elems:
+            elems[i] = 1
+        else:
+            return True
+    return False
+
+# test case
+three = BinaryNode(3)
+five = BinaryNode(5)
+one = BinaryNode(1)
+four = BinaryNode(4)
+two = BinaryNode(2)
+six = BinaryNode(6)
+
+three.left = two
+three.right = five
+two.left = one
+five.left = four
+five.right = six
+
+tree = []
+result = inOrderTraversal(three, tree)
+print (result)
 
 
 
